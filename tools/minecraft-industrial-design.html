@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minecraft Industrial Design Project - David</title>
+<style>
+  /* Reset & Global Styles */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; background: #f5f5f5; color: #222; line-height: 1.6; }
+  a { color: #0077cc; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* Container */
+  .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+
+  /* Hero Section with Background Image */
+  .hero {
+    width: 100%;
+    height: 40vh;
+    background: #0077cc url('../src/tool-images/old-main-side.png') center/cover no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-size: 3.5rem;
+    font-weight: bold;
+    text-align: center;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.4);
+    position: relative;
+  }
+
+  /* Sections */
+  .section { margin-bottom: 60px; }
+  .section h2 {
+    font-size: 2rem;
+    color: #0077cc;
+    margin-bottom: 20px;
+    border-bottom: 3px solid #0077cc;
+    display: inline-block;
+    padding-bottom: 5px;
+  }
+  p { margin-bottom: 15px; }
+  ul { margin: 15px 0 15px 25px; }
+
+  /* Carousel / Gallery */
+  .carousel { position: relative; overflow: hidden; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); height: 400px; }
+  .carousel-track { display: flex; transition: transform 0.5s ease; height: 100%; }
+  .carousel-slide { min-width: 100%; height: 100%; user-select: none; }
+  .carousel-slide img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
+
+  /* Arrows */
+  .carousel-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    border: none;
+    font-size: 2rem;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 50%;
+    z-index: 10;
+    transition: background 0.3s;
+  }
+  .carousel-arrow:hover { background: rgba(0,0,0,0.8); }
+  .arrow-left { left: 20px; }
+  .arrow-right { right: 20px; }
+
+  /* Timeline / Progress Section */
+  .timeline { display: flex; flex-direction: column; gap: 20px; }
+  .timeline .event { background: #fff; padding: 20px; border-left: 5px solid #0077cc; border-radius: 5px; box-shadow: 0 6px 15px rgba(0,0,0,0.1); opacity: 0; transform: translateX(-50px); transition: all 0.6s ease-out; }
+  .timeline .event.show { opacity: 1; transform: translateX(0); }
+
+  /* Call to Action Section */
+  .cta {
+    background: #0077cc;
+    color: #fff;
+    padding: 40px 20px;
+    border-radius: 10px;
+    text-align: center;
+  }
+  .cta a {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 12px 25px;
+    background: #fff;
+    color: #0077cc;
+    font-weight: bold;
+    border-radius: 5px;
+    transition: background 0.3s;
+  }
+  .cta a:hover { background: #e0e0e0; }
+
+  /* Footer */
+  footer { text-align: center; margin: 60px 0 20px; font-size: 0.9rem; color: #555; }
+
+  /* Responsive */
+  @media (max-width: 768px) { .carousel { height: 300px; } }
+  @media (max-width: 480px) { .carousel { height: 250px; } }
+</style>
+</head>
+<body>
+
+  <!-- Hero / Banner -->
+  <div class="hero">Minecraft Industrial Design Project</div>
+
+  <div class="container">
+
+    <!-- Project Overview -->
+    <div class="section">
+      <h2>Project Overview</h2>
+      <p>I have been recreating the Utah State University Logan campus in Minecraft since 2021, working solo to build a detailed, playable replica. To date, about 20 buildings are complete, with careful attention to accurate measurements and color palettes matching Minecraft blocks.</p>
+      <p><strong>Goal:</strong> Showcase progress, invite future contributors, and eventually pitch this as a university club.</p>
+      <ul>
+        <li>Precise building replication from Google Maps 3D views.</li>
+        <li>Consistent color palettes mapped to Minecraft blocks.</li>
+        <li>Collaboration encouraged as the project grows.</li>
+      </ul>
+    </div>
+
+    <!-- Gallery -->
+    <div class="section">
+      <h2>Gallery</h2>
+      <div class="carousel">
+        <div class="carousel-track">
+          <div class="carousel-slide"><img src="../src/tool-images/quad-and-tsc.png" alt="USU Campus Aerial"></div>
+          <div class="carousel-slide"><img src="../src/tool-images/business-courtyard.png" alt="Main Quad"></div>
+          <div class="carousel-slide"><img src="../src/tool-images/business-front.png" alt="Engineering Building"></div>
+          <div class="carousel-slide"><img src="../src/tool-images/quad-aerial.png" alt="Campus Walkway"></div>
+          <div class="carousel-slide"><img src="../src/tool-images/old-main-side.png" alt="Campus Walkway"></div>
+          <div class="carousel-slide"><img src="../src/tool-images/stadium-and-cemetary.png" alt="Campus Walkway"></div>
+          <div class="carousel-slide"><img src="../src/tool-images/track-and-stadium.png" alt="Campus Walkway"></div>
+        </div>
+        <button class="carousel-arrow arrow-left">&#10094;</button>
+        <button class="carousel-arrow arrow-right">&#10095;</button>
+      </div>
+    </div>
+
+    <!-- Timeline / Progress -->
+    <div class="section">
+      <h2>Progress & Timeline</h2>
+      <div class="timeline">
+        <div class="event">2021 – Project kickoff: Initial planning and mapping.</div>
+        <div class="event">2021-2023 – First 20 buildings completed.</div>
+        <div class="event">2023-2024 – Landscaping development and map expansion.</div>
+        <div class="event">2025 – Continuing refinements; looking for future contributors.</div>
+      </div>
+    </div>
+
+    <!-- Call to Action -->
+    <div class="section cta">
+      <h2>Join the Project!</h2>
+      <p>If you're interested in contributing to building the USU campus replica or helping grow this into an official club, please reach out.</p>
+      <a href="mailto:a02365616@usu.edu">Contact & Contribute: a02365616@usu.edu</a>
+    </div>
+
+  </div>
+
+  <footer>
+    &copy; 2025 David Jorgensen &nbsp;|&nbsp; <a href="index.html">Back to Projects</a>&nbsp;|&nbsp;<strong>Minecraft Shaders:</strong> Complementary Reimagined
+  </footer>
+
+<script>
+  // Carousel JS
+  const track = document.querySelector('.carousel-track');
+  const slides = Array.from(track.children);
+  const prevButton = document.querySelector('.arrow-left');
+  const nextButton = document.querySelector('.arrow-right');
+  let currentIndex = 0;
+
+  function updateCarousel() {
+    track.style.transform = `translateX(-${currentIndex * 100}%)`;
+  }
+
+  prevButton.addEventListener('click', () => {
+    currentIndex = (currentIndex === 0) ? slides.length - 1 : currentIndex - 1;
+    updateCarousel();
+  });
+
+  nextButton.addEventListener('click', () => {
+    currentIndex = (currentIndex === slides.length - 1) ? 0 : currentIndex + 1;
+    updateCarousel();
+  });
+
+  // Swipe support
+  let startX = 0;
+  track.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+  track.addEventListener('touchend', e => {
+    const endX = e.changedTouches[0].clientX;
+    if (startX - endX > 50) nextButton.click();
+    else if (endX - startX > 50) prevButton.click();
+  });
+
+  // Scroll-triggered timeline animation
+  const events = document.querySelectorAll('.timeline .event');
+  window.addEventListener('scroll', () => {
+    const triggerBottom = window.innerHeight * 0.85;
+    events.forEach(event => {
+      const eventTop = event.getBoundingClientRect().top;
+      if(eventTop < triggerBottom) event.classList.add('show');
+    });
+  });
+</script>
+
+</body>
+</html>

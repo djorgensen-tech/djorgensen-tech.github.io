@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TIR Program for TI‑84 Plus CE - David</title>
+<style>
+  /* Global Dark Theme */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box; /* ensures padding doesn't break layout */
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: #0f0f0f;
+    color: #f9f9f9;
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  a {
+    color: #00aaff;
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+
+  /* Container */
+  .container {
+    max-width: 1000px;
+    width: 100%;
+    padding: 20px;
+  }
+
+  /* Hero / Banner */
+  .hero {
+    width: 100%;
+    height: 25vh;
+    background-color: #222;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #00aaff;
+    font-size: 3rem;
+    font-weight: bold;
+    text-align: center;
+    border-bottom: 3px solid #00aaff;
+  }
+
+  h2 {
+    color: #00aaff;
+    margin-bottom: 20px;
+  }
+
+  /* Project Overview */
+  .section {
+    margin-bottom: 60px;
+  }
+  p {
+    margin-bottom: 15px;
+  }
+
+  /* Calculator Gallery */
+  .calc-gallery {
+    position: relative;
+    width: 400px; /* default width on desktop */
+    max-width: 100%; /* ensures it shrinks on smaller screens */
+    margin: 0 auto;
+  }
+
+  .calc-base,
+  .calc-screen {
+    display: block;
+    width: 100%;
+    border-radius: 10px;
+  }
+
+  .calc-screen {
+    position: absolute;
+    top: 10%;   /* adjust as needed for the PNG overlay */
+    left: 0;
+    width: 100%;
+    height: 65%; /* fits screen area */
+    object-fit: contain;
+    pointer-events: none;
+  }
+
+  /* Gallery arrows */
+  .arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    border: none;
+    font-size: 2rem;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: background 0.3s;
+    user-select: none;
+    z-index: 10;
+  }
+  .arrow:hover {
+    background: rgba(0,0,0,0.8);
+  }
+  .arrow-left { left: -60px; }
+  .arrow-right { right: -60px; }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    margin: 60px 0 20px;
+    font-size: 0.9rem;
+    color: #555;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .container { padding: 15px; }
+    .calc-gallery { width: 300px; }
+    .arrow-left { left: -40px; }
+    .arrow-right { right: -40px; }
+  }
+
+  @media (max-width: 480px) {
+    .container { padding: 10px; }
+    .calc-gallery { width: 100%; max-width: 300px; }
+    .arrow-left { left: -30px; }
+    .arrow-right { right: -30px; }
+  }
+</style>
+
+</head>
+<body>
+
+<div class="hero">TIR - TI‑84 Plus CE Program</div>
+
+<div class="container">
+
+  <!-- Project Overview -->
+  <div class="section">
+    <h2>Project Overview</h2>
+    <p>The TIR program is a 3D modeling tool I created for the TI‑84 Plus CE calculator. It allows visualization of 3D shapes directly on the calculator screen. Development started in 2020–2021, and I have several screenshots of the program in action.</p>
+  </div>
+
+  <!-- Calculator Gallery -->
+  <div class="section">
+    <h2>Program Screenshots</h2>
+    <div class="calc-gallery">
+      <button class="arrow arrow-left">&#10094;</button>
+      <img class="calc-base" src="../src/tool-images/calculator-full.png" alt="TI-84 Calculator Base">
+      <img class="calc-screen" src="../src/tool-images/title-screen.png" alt="TIR Program Screen">
+      <button class="arrow arrow-right">&#10095;</button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  &copy; 2025 David Jorgensen &nbsp;|&nbsp; <a href="index.html">Back to Projects</a>
+</footer>
+
+<script>
+  // Simple gallery script
+  const screens = [
+    "../src/tool-images/title-screen.png",
+    "../src/tool-images/main-menu.png",
+    "../src/tool-images/build1.png",
+    "../src/tool-images/build2.png",
+    "../src/tool-images/build3.png",
+    "../src/tool-images/build4.png",
+  ];
+  let current = 0;
+
+  const screenImg = document.querySelector(".calc-screen");
+  const prevBtn = document.querySelector(".arrow-left");
+  const nextBtn = document.querySelector(".arrow-right");
+
+  function updateScreen() {
+    screenImg.src = screens[current];
+  }
+
+  prevBtn.addEventListener("click", () => {
+    current = (current === 0) ? screens.length - 1 : current - 1;
+    updateScreen();
+  });
+
+  nextBtn.addEventListener("click", () => {
+    current = (current === screens.length - 1) ? 0 : current + 1;
+    updateScreen();
+  });
+</script>
+
+</body>
+</html>

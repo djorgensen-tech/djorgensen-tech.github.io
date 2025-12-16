@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SketchUp SVG Web Display Editor v1</title>
+
+<!-- Paper.js -->
+<script src="https://unpkg.com/paper@0.12.17/dist/paper-full.min.js"></script>
+
+<style>
+body {
+  margin:0;
+  font-family:system-ui,sans-serif;
+  display:flex;
+  height:100vh;
+  background:#121212;
+  color:#e0e0e0;
+}
+
+#left, #middle, #right {
+  padding:20px;
+  overflow:auto;
+  border-radius:16px;
+  background: rgba(30,30,30,0.75);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow:0 8px 24px rgba(0,0,0,0.5);
+  margin:10px;
+}
+
+#left { width:28%; border-right:2px solid rgba(255,255,255,0.1); }
+#middle { width:22%; border-right:2px solid rgba(255,255,255,0.1); display:flex; flex-direction:column; }
+#right { flex:1; display:flex; flex-direction:column; }
+
+h2 { margin-top:0; color:#fff; }
+
+/* Sticky/frozen headers for middle panel */
+#middle h2,
+#fillModeBtn {
+  position: sticky;
+  top: 0;
+  background: rgba(30,30,30,0.75);
+  padding: 10px 0;
+  z-index: 1;
+}
+
+#fillModeBtn {
+  width: 100%;
+  margin: 6px 0;
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
+  background: linear-gradient(90deg, #ff8c00, #ffa500); /* bright orange gradient */
+  border: 2px solid #ffae42;
+  border-radius: 12px;
+  padding: 8px 12px;
+  cursor: pointer;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  transition: transform 0.1s, box-shadow 0.2s, background 0.2s;
+  position: sticky;
+  top: 0;
+  z-index: 2; /* higher than h2 */
+}
+
+#fillModeBtn:hover {
+  background: linear-gradient(90deg, #ffa500, #ffb733);
+  transform: scale(1.03);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+}
+
+
+#shapeList {
+  flex:1;
+  overflow:auto;
+  padding-top:10px; /* space under sticky header */
+}
+
+input[type=file], button {
+  width:100%;
+  margin:6px 0;
+  font-size:14px;
+  background: rgba(255,255,255,0.1);
+  border:none;
+  color:#fff;
+  padding:6px 10px;
+  border-radius:12px;
+  cursor:pointer;
+}
+
+button:hover { background: rgba(255,255,255,0.2); }
+
+textarea {
+  width:100%;
+  height:calc(100vh - 280px);
+  font-family:monospace;
+  font-size:13px;
+  background: rgba(50,50,50,0.6);
+  color:#fff;
+  border:none;
+  border-radius:12px;
+  padding:10px;
+  resize:none;
+}
+
+canvas {
+  flex:1;
+  background: rgba(20,20,20,0.6);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:16px;
+}
+
+.shape-item {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:4px 6px;
+  border-radius:6px;
+  font-family:monospace;
+}
+
+.shape-item:hover { background: rgba(80,80,80,0.4); }
+
+.shape-item.hovered {
+  outline: 2px solid orange; /* orange outline */
+  background: transparent;    /* no fill */
+}
+
+.delete-btn {
+  width: 60px;          /* square-ish */
+  height: 24px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background: rgba(200,50,50,0.6);
+  border:none;
+  border-radius:6px;
+  color:#fff;
+  cursor:pointer;
+  flex-shrink:0;
+  font-size:12px;
+  text-align:center;
+}
+
+.delete-btn:hover { background: rgba(255,80,80,0.5); }
+</style>
+
+
+</head>
+<body>
+
+<div id="left">
+  <h2>Upload SVG</h2>
+  <input type="file" id="svgFile" accept="image/svg+xml">
+  <button id="exportBtn" disabled>Export JSON</button>
+
+  <h2>Output JSON</h2>
+  <textarea id="jsonOutput" readonly></textarea>
+</div>
+
+<div id="middle">
+  <h2>Shapes</h2>
+  <div id="shapeList">No SVG loaded</div>
+</div>
+
+<div id="right">
+  <h2>Preview</h2>
+  <canvas id="canvas" resize></canvas>
+</div>
+
+<script>
+paper.setup(document.getElementById('canvas'));
+
+let importedItem = null;
+let shapes = [];
+let fillMode = false;
+
+const svgInput = document.getElementById('svgFile');
+const exportBtn = document.getElementById('exportBtn');
+const jsonOutput = document.getElementById('jsonOutput');
+const shapeList = document.getElementById('shapeList');
+
+// Add Fill Mode toggle button
+const fillModeBtn = document.createElement('button');
+fillModeBtn.id = 'fillModeBtn';
+fillModeBtn.textContent = 'Toggle Fill Mode';
+shapeList.parentElement.insertBefore(fillModeBtn, shapeList);
+
+fillModeBtn.addEventListener('click', () => {
+    fillMode = !fillMode;
+    updateShapeList();
+    updateShapeColors();
+});
+
+svgInput.addEventListener('change', () => {
+    const file = svgInput.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = e => importSVG(e.target.result);
+    reader.readAsText(file);
+});
+
+function importSVG(svgText) {
+    paper.project.clear();
+    shapes = [];
+
+    paper.project.importSVG(svgText, item => {
+        importedItem = item;
+        item.position = paper.view.center;
+        fitToView(item);
+        extractPaths(item);
+        updateShapeList();
+        updateShapeColors();
+        exportBtn.disabled = false;
+    });
+}
+
+function fitToView(item) {
+    const bounds = item.bounds;
+    const margin = 40;
+    const scale = Math.min(
+        (paper.view.size.width - margin) / bounds.width,
+        (paper.view.size.height - margin) / bounds.height
+    );
+    item.scale(scale);
+    item.position = paper.view.center;
+}
+
+
+
+// Recursive function to attach hover/click events to all paths and compound paths
+function attachHoverEvents(item) {
+    item.onMouseEnter = function() {
+        if (!fillMode) return;
+
+        const top = item.getTopLevel ? item.getTopLevel() : item;
+        top.savedFill = top.fillColor;
+        top.fillColor = new paper.Color('orange');
+
+        const div = shapeList.children[shapes.indexOf(top)];
+        if (div) {
+            div.classList.add('hovered');
+            div.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        paper.view.update();
+    };
+
+    item.onMouseLeave = function() {
+        if (!fillMode) return;
+
+        const top = item.getTopLevel ? item.getTopLevel() : item;
+        top.fillColor = top.filled ? new paper.Color('purple') : new paper.Color('white');
+
+        const div = shapeList.children[shapes.indexOf(top)];
+        if (div) div.classList.remove('hovered');
+
+        paper.view.update();
+    };
+
+    item.onClick = function() {
+        if (!fillMode) return;
+
+        const top = item.getTopLevel ? item.getTopLevel() : item;
+        top.filled = !top.filled;
+        top.fillColor = top.filled ? new paper.Color('purple') : new paper.Color('white');
+
+        const div = shapeList.children[shapes.indexOf(top)];
+        if (div) {
+            const fillBtn = div.querySelector('.delete-btn');
+            if (fillBtn) fillBtn.textContent = top.filled ? 'Filled' : 'Fill';
+        }
+
+        jsonOutput.value = JSON.stringify(exportJSON(), null, 2);
+    };
+
+    if (item.children) item.children.forEach(child => attachHoverEvents(child));
+}
+
+function extractPaths(item) {
+    if (item.children) {
+        item.children.forEach(child => {
+            child.originalStroke = child.strokeColor || new paper.Color('black');
+            extractPaths(child);
+        });
+    }
+
+    if (item instanceof paper.Path || item instanceof paper.CompoundPath) {
+        item.filled = false;
+        item.originalStroke = item.strokeColor || new paper.Color('black');
+        item.fillColor = item.closed ? new paper.Color('white') : null;
+        item.strokeColor = new paper.Color('black');
+        item.strokeWidth = 1;
+
+        shapes.push(item);
+        attachHoverEvents(item);
+    }
+}
+
+function updateShapeColors() {
+    shapes.forEach(item => {
+        if (fillMode) {
+            item.fillColor = item.filled ? new paper.Color('purple') : new paper.Color('white');
+            item.strokeColor = new paper.Color('black');
+        } else if (item.closed) {
+            item.fillColor = randomColor();
+            item.strokeColor = randomColor();
+        } else {
+            item.fillColor = null;
+            item.strokeColor = randomColor();
+        }
+    });
+    paper.view.update();
+}
+
+function randomColor() {
+    const h = Math.random() * 360;
+    const s = 0.7 + Math.random() * 0.3;
+    const l = 0.4 + Math.random() * 0.2;
+    return new paper.Color({ hue: h, saturation: s, lightness: l });
+}
+
+exportBtn.addEventListener('click', () => {
+  const jsonData = jsonOutput.value;
+
+  // Ask user for a file name
+  let fileName = prompt("Enter a name for the JSON file:", "shapes-export");
+  if (!fileName) return; // User cancelled
+
+  // Add .json if missing
+  if (!fileName.toLowerCase().endsWith(".json")) {
+    fileName += ".json";
+  }
+
+  const blob = new Blob([jsonData], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fileName;
+  a.click();
+
+  URL.revokeObjectURL(url);
+});
+
+
+
+
+function exportJSON() {
+    const bounds = paper.project.activeLayer.bounds;
+    const maxDim = Math.max(bounds.width, bounds.height);
+
+    return shapes.map((item, index) => {
+        const paths = [];
+        const children = item instanceof paper.CompoundPath ? item.children : [item];
+
+        children.forEach(p => {
+            const pts = p.segments.map(seg => ({
+                x: (seg.point.x - bounds.left) / maxDim,
+                y: 1 - (seg.point.y - bounds.top) / maxDim
+            }));
+            paths.push(pts);
+        });
+
+        return {
+            index,
+            type: item instanceof paper.CompoundPath ? 'compoundpath' : 'path',
+            paths,
+            filled: item.filled
+        };
+    });
+}
+
+function updateShapeList() {
+    shapeList.innerHTML = '';
+    if (!shapes.length) {
+        shapeList.textContent = 'No paths found';
+        return;
+    }
+
+    shapes.forEach((item, i) => {
+        const div = document.createElement('div');
+        div.className = 'shape-item';
+        div.textContent = `Shape #${i}`;
+
+        if (fillMode) {
+            const fillBtn = document.createElement('button');
+            fillBtn.className = 'delete-btn';
+            fillBtn.textContent = item.filled ? 'Filled' : 'Fill';
+            fillBtn.onclick = () => {
+                item.filled = !item.filled;
+                fillBtn.textContent = item.filled ? 'Filled' : 'Fill';
+                updateShapeColors();
+                jsonOutput.value = JSON.stringify(exportJSON(), null, 2);
+            };
+            div.appendChild(fillBtn);
+        } else {
+            const del = document.createElement('button');
+            del.className = 'delete-btn';
+            del.textContent = 'Delete';
+            del.onclick = () => {
+                item.remove();
+                shapes.splice(i, 1);
+                updateShapeList();
+            };
+            div.appendChild(del);
+        }
+
+        shapeList.appendChild(div);
+    });
+
+    jsonOutput.value = JSON.stringify(exportJSON(), null, 2);
+}
+
+// --- PAN & ZOOM ---
+let isDragging = false;
+let lastPoint = null;
+
+paper.view.onMouseDown = function(event) {
+    if (event.event.button === 0) {
+        isDragging = true;
+        lastPoint = event.point;
+    }
+};
+
+paper.view.onMouseDrag = function(event) {
+    if (isDragging) {
+        const delta = event.point.subtract(lastPoint).divide(paper.view.zoom);
+        paper.view.center = paper.view.center.subtract(delta);
+        lastPoint = event.point;
+    }
+};
+
+paper.view.onMouseUp = function(event) {
+    isDragging = false;
+};
+
+const zoomFactor = 1.1;
+paper.view.element.addEventListener('wheel', function(event) {
+    event.preventDefault();
+    if (event.deltaY < 0) paper.view.zoom *= zoomFactor;
+    else paper.view.zoom /= zoomFactor;
+    paper.view.update();
+});
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About - David</title>
+<style>
+  body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: #0f0f0f;
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+    box-sizing: border-box;
+    min-height: 100vh;
+  }
+
+  .about-container {
+    display: flex;
+    gap: 40px;
+    max-width: 1000px;
+    width: 100%;
+    height: 70vh;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .text-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  h1 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    text-align: left;
+  }
+
+  p {
+    font-size: 1.4rem;
+    line-height: 1.6;
+    margin: 0;
+    text-align: left;
+  }
+
+.logo-column {
+  width: 40%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative; /* ensures canvas can absolutely fill if needed */
+}
+
+  canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+/* MOBILE ADJUSTMENTS */
+@media (max-width: 768px) {
+  .about-container {
+    flex-direction: column;
+    height: auto;
+    gap: 20px;
+    align-items: center;
+    padding-top: 60px;    /* increased top padding */
+    padding-bottom: 60px; /* increased bottom padding */
+  }
+
+  .logo-column {
+    width: 80%;
+    height: 250px; /* definite height */
+    margin-bottom: 20px;
+  }
+
+  .text-column {
+    width: 90%;
+    text-align: center;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  p {
+    font-size: 0.8rem;
+  }
+}
+
+
+</style>
+
+<script src="https://unpkg.com/paper@0.12.17/dist/paper-full.min.js"></script>
+</head>
+<body>
+
+<div class="about-container">
+<div class="text-column">
+  <h1>About Me</h1>
+  <p>I started programming on a TI-84 calculator in high school, building a 3D modeler for fun and learning linear algebra along the way.</p>
+  <p>Today I’m a senior in Computer Science at USU, focusing on full-stack development, enjoying Django backends and front-end design, and collaborating at the Analytics Solution Center. I’m also currently learning Swift for macOS and iOS development.</p>
+</div>
+
+  <div class="logo-column">
+    <canvas id="logoCanvas"></canvas>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById('logoCanvas');
+paper.setup(canvas);
+
+let allPaths = [];
+let drawPaths = [];
+let animationRunning = false;
+const drawSpeed = 0.25;
+let shapesData = null;
+
+// Main path setup
+function setupPaths(shapes) {
+  shapesData = shapes;
+  drawPaths = [];
+  allPaths.forEach(p => p.remove());
+  allPaths = [];
+
+  // Compute bounds of all points
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  shapes.forEach(shape => {
+    shape.paths.forEach(pathArr => {
+      pathArr.forEach(pt => {
+        minX = Math.min(minX, pt.x);
+        maxX = Math.max(maxX, pt.x);
+        minY = Math.min(minY, pt.y);
+        maxY = Math.max(maxY, pt.y);
+      });
+    });
+  });
+
+  const shapeWidth = maxX - minX;
+  const shapeHeight = maxY - minY;
+
+  // Use actual rendered size
+  const rect = canvas.getBoundingClientRect();
+  const scale = Math.min(rect.width / shapeWidth, rect.height / shapeHeight) * 0.9;
+  const offsetX = (rect.width - shapeWidth * scale) / 2;
+  const offsetY = (rect.height - shapeHeight * scale) / 2;
+
+  shapes.forEach(shape => {
+    shape.paths.forEach(pathArr => {
+      const p = new paper.Path();
+      pathArr.forEach(pt => {
+        const x = (pt.x - minX) * scale + offsetX;
+        const y = rect.height - ((pt.y - minY) * scale + offsetY); // flip y
+        p.add(new paper.Point(x, y));
+      });
+      p.closed = true;
+      p.strokeColor = '#fff';
+      p.strokeWidth = window.innerWidth < 768 ? 1.5 : 2; // slightly thinner on mobile
+      p.fillColor = null;
+      allPaths.push(p);
+    });
+  });
+
+  resetPaths();
+}
+
+// Reset path drawing for animation
+function resetPaths() {
+  drawPaths = allPaths.map(p => ({ path: p, progress: 0 }));
+  allPaths.forEach(p => p.dashArray = [0, p.length]);
+}
+
+// Animate drawing
+function startAnimation() {
+  if (animationRunning) return;
+  animationRunning = true;
+  paper.view.onFrame = (event) => {
+    let done = true;
+    drawPaths.forEach(d => {
+      if (d.progress < 1) {
+        d.progress += drawSpeed * event.delta;
+        if (d.progress > 1) d.progress = 1;
+        const len = d.path.length * d.progress;
+        d.path.dashArray = [len, d.path.length - len];
+        d.path.dashOffset = 0;
+        done = false;
+      }
+    });
+    if (done) paper.view.onFrame = null;
+  };
+}
+
+// Fetch JSON and setup
+fetch('../files/UtahStateSimplified.json')
+  .then(res => res.json())
+  .then(shapes => {
+    // Wait a frame to ensure canvas has proper size
+    requestAnimationFrame(() => setupPaths(shapes));
+  })
+  .catch(err => console.error('Error loading JSON:', err));
+
+// Intersection Observer to trigger animation
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      startAnimation();
+    } else {
+      resetPaths();
+      paper.view.draw();
+      animationRunning = false;
+    }
+  });
+}, { threshold: 0 });
+
+observer.observe(document.querySelector('.logo-column'));
+
+// Handle resizing properly
+function resizeCanvas() {
+  // Use actual bounding rect to avoid mobile quirks
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width;
+  canvas.height = rect.height;
+  paper.view.viewSize = new paper.Size(canvas.width, canvas.height);
+
+  if (shapesData) setupPaths(shapesData);
+}
+
+// Call initially after a small delay to ensure viewport stabilizes
+window.addEventListener('load', () => setTimeout(resizeCanvas, 50));
+window.addEventListener('resize', resizeCanvas);
+window.addEventListener('orientationchange', () => setTimeout(resizeCanvas, 50));
+</script>
+
+</body>
+</html>

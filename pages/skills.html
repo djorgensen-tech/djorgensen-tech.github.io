@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skills - David</title>
+<style>
+  body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    font-family: 'Inter', sans-serif;
+    background-color: #0f0f0f;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .zoom-wrapper {
+    width: 90%;
+    height: 70%;
+    overflow: hidden;
+    position: relative;
+    margin: auto;
+    touch-action: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 3px solid #ffffff;
+  }
+
+
+  .zoom-wrapper {
+  cursor: grab; /* default when not dragging */
+  }
+
+  .zoom-wrapper:active {
+    cursor: grabbing; /* while dragging */
+  }
+
+  .grid-outer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: max-content;
+    height: max-content;
+    transform-origin: 0 0;
+    position: relative;
+  }
+
+  .grid-container {
+    display: grid;
+    grid-template-columns: repeat(9, 80px);
+    grid-template-rows: repeat(6, 80px);
+    gap: 60px;
+    justify-content: center;
+    align-content: center;
+    width: max-content;
+    height: max-content;
+    position: relative;
+  }
+
+  svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  line {
+    stroke: #ffffff;
+    stroke-width: 3;
+  }
+
+  .diamond-wrapper {
+    position: relative;
+    width: 80px;
+    height: 80px;
+  }
+
+  .diamond {
+    width: 80px;
+    height: 80px;
+    background-color: #ffffff;
+    transform: rotate(45deg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .diamond-border {
+    position: absolute;
+    width: 70px;
+    height: 70px;
+    border: 2px solid #000;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(45deg);
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .skill-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+    transform: rotate(-45deg); /* keeps images upright */
+  }
+
+  .skill-bubble {
+  position: absolute;
+  bottom: -5px;
+  right: -5px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #000;
+  font-size: 12px;
+  font-weight: bold;
+  border: 2px solid #fff;
+  z-index: 3;
+}
+
+.tooltip {
+  position: absolute;
+  padding: 6px 10px;
+  background: rgba(20, 20, 20, 0.95);
+  color: #fff;
+  border-radius: 6px;
+  font-size: 13px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -100%);
+  transition: opacity 0.15s ease;
+  z-index: 10;
+}
+
+.tooltip.visible {
+  opacity: 1;
+}
+
+.mobile-info {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.mobile-info.hidden {
+  display: none;
+}
+
+.mobile-info-card {
+  background: #ffffff;
+  padding: 20px;
+  min-width: 260px;
+  max-width: 90%;
+  border: 2px solid #000;
+}
+
+.mobile-info-card-inner {
+  border: 2px solid #000;
+  padding: 16px;
+}
+
+.mobile-info-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #000;
+  margin-bottom: 6px;
+}
+
+.mobile-info-level {
+  font-size: 14px;
+  color: #000;
+  margin-bottom: 12px;
+}
+
+.mobile-info-close {
+  background: #fff;
+  color: #000;
+  border: 2px solid #000;
+  padding: 6px 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.mobile-info-level div:first-child {
+  opacity: 0.7;
+  font-size: 13px;
+}
+
+.lightbox {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 50;
+}
+
+.lightbox-content {
+  background: #ffffff;
+  color: #000;
+  padding: 24px 32px;
+  border: 2px solid #000;
+  text-align: center;
+  max-width: 80%;
+}
+
+.lightbox-content h2 {
+  margin-top: 0;
+  font-size: 20px;
+}
+
+.lightbox-content p {
+  margin: 12px 0;
+}
+
+.lightbox-content button {
+  background: #000000;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.lightbox-content button:hover {
+  background: #4d4d4d;
+}
+
+
+</style>
+</head>
+<body>
+
+
+
+<div class="zoom-wrapper" id="zoomWrapper">
+  <div id="skillTreeLightbox" class="lightbox">
+    <div class="lightbox-content">
+      <h2>SKILL TREE</h2>
+      <p>Explore the tree to view my professional skills!</p>
+      <button id="closeLightbox">Got it!</button>
+    </div>
+  </div>
+
+  <div class="grid-outer" id="gridOuter">
+    <div class="grid-container" id="gridContainer">
+      <svg id="lines"></svg>
+    </div>
+  </div>
+</div>
+
+<div id="tooltip" class="tooltip"></div>
+
+<div id="mobileInfo" class="mobile-info hidden">
+  <div class="mobile-info-card">
+    <div class="mobile-info-card-inner">
+      <div class="mobile-info-title" id="mobileInfoTitle"></div>
+      <div class="mobile-info-level" id="mobileInfoLevel"></div>
+      <button class="mobile-info-close">Close</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+
+
+let tooltipLocked = false;
+
+
+// ----- Skills Data -----
+const skillGroups = {
+  "Programming & Development": {
+    color: "#cfe8ff", // light blue
+    skills: [
+      "Python","Java","JavaScript","C#",
+      "Django","React","Expo","Android Studio",
+      "SQLite","SQL","PostgreSQL","Microsoft SQL Server"
+    ]
+  },
+  "Tools & Platforms": {
+    color: "#d7f5d7", // light green
+    skills: ["Git","VSCode","PyCharm","IntelliJ","AWS"]
+  },
+  "Design & Creative Tools": {
+    color: "#fff0c2", // light yellow
+    skills: ["Figma","SketchUp"]
+  },
+  "Academics & Algorithms": {
+    color: "#e9d7ff", // light purple
+    skills: [
+      "Data Structures & Algorithms",
+      "Linear Algebra / Calculus / Discrete Math",
+      "Prompt Engineering / AI Coding"
+    ]
+  },
+  "Hobbies & Languages": {
+    color: "#ffd6d6", // light red
+    skills: ["Spanish","Cooking","Piano","Movies / Film","Guitar"]
+  }
+};
+
+
+const skills = [
+  {id:1, col:1, row:1, level:4, name:"Python"},
+  {id:2, col:1, row:2, level:4, name:"JavaScript"},
+  {id:3, col:1, row:3, level:3, name:"Java"},
+  {id:4, col:1, row:4, level:3, name:"C#"},
+  {id:5, col:2, row:1, level:3, name:"React"},
+  {id:6, col:2, row:2, level:3, name:"Expo"},
+  {id:7, col:2, row:3, level:2, name:"Android Studio"},
+  {id:8, col:2, row:4, level:4, name:"Django"},
+  {id:9, col:2, row:6, level:4, name:"Data Structures & Algorithms"},
+  {id:10, col:3, row:1, level:3, name:"PostgreSQL"},
+  {id:11, col:3, row:2, level:4, name:"SQLite"},
+  {id:12, col:3, row:3, level:4, name:"Microsoft SQL Server"},
+  {id:13, col:3, row:4, level:5, name:"SQL"},
+  {id:14, col:3, row:6, level:5, name:"Linear Algebra / Calculus / Discrete Math"},
+  {id:15, col:4, row:6, level:4, name:"Prompt Engineering / AI Coding"},
+  {id:16, col:5, row:1, level:4, name:"AWS"},
+  {id:17, col:5, row:2, level:5, name:"VSCode"},
+  {id:18, col:5, row:3, level:4, name:"PyCharm"},
+  {id:19, col:5, row:4, level:3, name:"IntelliJ"},
+  {id:20, col:6, row:2, level:4, name:"Git"},
+  {id:21, col:6, row:6, level:2, name:"Figma"},
+  {id:22, col:7, row:1, level:2, name:"Cooking"},
+  {id:23, col:7, row:6, level:5, name:"SketchUp"},
+  {id:24, col:8, row:1, level:3, name:"Piano"},
+  {id:25, col:8, row:2, level:2, name:"Guitar"},
+  {id:26, col:8, row:3, level:3, name:"Spanish"},
+  {id:27, col:9, row:1, level:4, name:"Movies / Film"}
+];
+
+function getSkillGroup(skillName) {
+  for (const [groupName, group] of Object.entries(skillGroups)) {
+    if (group.skills.includes(skillName)) {
+      return {
+        name: groupName,
+        color: group.color
+      };
+    }
+  }
+  return {
+    name: "Other",
+    color: "#ffffff"
+  };
+}
+
+
+// ----- Connections (SVG lines) -----
+const connections = [
+  [1,2],[2,3],[3,4],
+  [1,5],[5,6],[6,7],[7,8],
+  [5,10],[9,14],[10,11],[11,12],[12,13],
+  [14,15],[16,17],[17,18],[18,19],[17,20],
+  [21,23],[24,27],[22,24],[24,25],[25,26]
+];
+
+// ----- Diamond Class -----
+const levelColors = {
+  1: "#f28b82", // light red → beginner
+  2: "#fbbc04", // orange → basic
+  3: "#fff475", // yellow → intermediate
+  4: "#34a853", // green → advanced
+  5: "#0b8043"  // deep green → expert
+};
+
+
+class Diamond {
+  constructor({id, col, row, level, name}) {
+  this.id = id;
+  this.col = col;
+  this.row = row;
+  this.level = level;
+  this.name = name;
+
+  const group = getSkillGroup(name);
+  this.groupName = group.name;
+  this.groupColor = group.color;
+
+  this.src = `../src/skills/skill${id}.png`;
+  this.alt = name;
+}
+
+
+
+render() {
+  const wrapper = document.createElement('div');
+  wrapper.classList.add('diamond-wrapper');
+  wrapper.style.gridColumn = this.col;
+  wrapper.style.gridRow = this.row;
+  wrapper.id = 'd' + this.id;
+
+  const diamond = document.createElement('div');
+  diamond.classList.add('diamond');
+  diamond.style.backgroundColor = this.groupColor;
+
+  const img = document.createElement('img');
+  img.classList.add('skill-img');
+  img.src = this.src;
+  img.alt = this.alt;
+  diamond.appendChild(img);
+  wrapper.appendChild(diamond);
+
+  const border = document.createElement('div');
+  border.classList.add('diamond-border');
+  wrapper.appendChild(border);
+
+  const bubble = document.createElement('div');
+  bubble.classList.add('skill-bubble');
+  bubble.textContent = this.level;
+  bubble.style.backgroundColor = levelColors[this.level];
+  wrapper.appendChild(bubble);
+
+  // --- Tooltip logic ---
+// --- Tooltip logic inside Diamond.render() ---
+const showTooltip = () => {
+  const tooltip = document.getElementById('tooltip');
+  if (!tooltip) return;
+
+  tooltip.innerHTML = `
+    <div style="font-weight:600">${this.name}</div>
+    <div style="font-size:12px; opacity:0.8">${this.groupName}</div>
+    <div style="font-size:12px">
+      Level <span style="color:${levelColors[this.level]}; font-weight:600">
+        ${this.level}
+      </span>
+    </div>
+  `;
+
+  // Set colored border based on category
+  tooltip.style.border = `2px solid ${this.groupColor}`;
+
+  tooltip.classList.add('visible');
+
+  const diamondRect = wrapper.getBoundingClientRect();
+  const containerRect = document
+    .getElementById('zoomWrapper')
+    .getBoundingClientRect();
+
+  let left = diamondRect.left + diamondRect.width / 2;
+  let top = diamondRect.top - 8;
+
+  const tooltipRect = tooltip.getBoundingClientRect();
+
+  const minLeft = containerRect.left + tooltipRect.width / 2 + 8;
+  const maxLeft = containerRect.right - tooltipRect.width / 2 - 8;
+  left = Math.max(minLeft, Math.min(left, maxLeft));
+
+  if (top - tooltipRect.height < containerRect.top) {
+    top = diamondRect.bottom + tooltipRect.height + 8;
+  }
+
+  tooltip.style.left = `${left}px`;
+  tooltip.style.top = `${top}px`;
+};
+
+
+  const hideTooltip = () => {
+    const tooltip = document.getElementById('tooltip');
+    if (!tooltip) return;
+
+    tooltip.classList.remove('visible');
+  };
+
+
+  wrapper.addEventListener('pointerenter', e => {
+    if (e.pointerType === 'mouse') {
+      showTooltip();
+    }
+  });
+
+  wrapper.addEventListener('pointerleave', e => {
+    if (e.pointerType === 'mouse') {
+      hideTooltip();
+    }
+  });
+
+
+
+  // Mobile tap support
+  wrapper.addEventListener('touchstart', e => {
+    e.preventDefault();
+    openMobileInfo(this);
+  });
+
+
+
+  return wrapper;
+}
+
+}
+
+
+// ----- Generate Diamonds -----
+const grid = document.getElementById('gridContainer');
+skills.forEach(skill => {
+  const d = new Diamond(skill);
+  grid.appendChild(d.render());
+});
+
+// ----- Draw Lines -----
+function drawLines() {
+  const svg = document.getElementById('lines');
+  svg.innerHTML = '';
+  const container = grid.getBoundingClientRect();
+
+  connections.forEach(([a,b]) => {
+    const n1 = document.getElementById('d'+a).getBoundingClientRect();
+    const n2 = document.getElementById('d'+b).getBoundingClientRect();
+
+    const x1 = n1.left + n1.width/2 - container.left;
+    const y1 = n1.top + n1.height/2 - container.top;
+    const x2 = n2.left + n2.width/2 - container.left;
+    const y2 = n2.top + n2.height/2 - container.top;
+
+    const line = document.createElementNS("http://www.w3.org/2000/svg","line");
+    line.setAttribute('x1',x1);
+    line.setAttribute('y1',y1);
+    line.setAttribute('x2',x2);
+    line.setAttribute('y2',y2);
+    line.setAttribute('stroke','#ffffff');
+    line.setAttribute('stroke-width',3);
+    svg.appendChild(line);
+  });
+}
+
+// ----- Pan & Zoom -----
+const wrapper = document.getElementById('zoomWrapper');
+const outer = document.getElementById('gridOuter');
+let scale = 1, originX = 0, originY = 0, startX = 0, startY = 0, isDragging = false, lastDistance = null;
+
+function centerGrid() { drawLines(); }
+
+wrapper.addEventListener('mousedown', e => { isDragging = true; startX = e.clientX - originX; startY = e.clientY - originY; });
+wrapper.addEventListener('mousemove', e => {
+  if(!isDragging) return;
+  originX = e.clientX - startX;
+  originY = e.clientY - startY;
+  outer.style.transform = `translate(${originX}px, ${originY}px) scale(${scale})`;
+});
+wrapper.addEventListener('mouseup', e => { isDragging = false; });
+wrapper.addEventListener('mouseleave', e => { isDragging = false; });
+
+function getDistance(touches) {
+  const dx = touches[0].clientX - touches[1].clientX;
+  const dy = touches[0].clientY - touches[1].clientY;
+  return Math.sqrt(dx*dx + dy*dy);
+}
+
+wrapper.addEventListener('touchstart', e => {
+  // 🔴 If user tapped a diamond, DO NOT start panning
+  if (e.target.closest('.diamond-wrapper')) return;
+
+  if (e.touches.length === 1){
+    isDragging = true;
+    startX = e.touches[0].clientX - originX;
+    startY = e.touches[0].clientY - originY;
+  } else if (e.touches.length === 2){
+    lastDistance = getDistance(e.touches);
+  }
+});
+
+wrapper.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if(e.touches.length === 1 && isDragging){
+    originX = e.touches[0].clientX - startX;
+    originY = e.touches[0].clientY - startY;
+    outer.style.transform = `translate(${originX}px, ${originY}px) scale(${scale})`;
+  } else if(e.touches.length === 2){
+    const distance = getDistance(e.touches);
+    if(lastDistance){
+      const delta = distance / lastDistance;
+      scale *= delta;
+      outer.style.transform = `translate(${originX}px, ${originY}px) scale(${scale})`;
+    }
+    lastDistance = distance;
+  }
+});
+wrapper.addEventListener('touchend', e => {
+  if(e.touches.length < 2) lastDistance = null;
+  if(e.touches.length === 0) isDragging = false;
+});
+
+wrapper.addEventListener('mousedown', () => {
+  document.getElementById('tooltip').classList.remove('visible');
+});
+
+document.body.addEventListener('touchend', e => {
+  const tooltip = document.getElementById('tooltip');
+  if (!tooltip) return;
+
+  // If tap was on a diamond, do nothing
+  if (e.target.closest('.diamond-wrapper')) return;
+
+  tooltip.classList.remove('visible');
+  tooltipLocked = false;
+});
+
+
+
+
+
+document.body.addEventListener('click', e => { if(!wrapper.contains(e.target)) centerGrid(); });
+
+window.addEventListener('resize', drawLines);
+window.addEventListener('load', centerGrid);
+
+// --- Mobile Helpers ---
+const mobileInfo = document.getElementById('mobileInfo');
+const mobileInfoTitle = document.getElementById('mobileInfoTitle');
+const mobileInfoLevel = document.getElementById('mobileInfoLevel');
+
+// --- Mobile info logic ---
+function openMobileInfo(skill) {
+  mobileInfoTitle.textContent = skill.name;
+
+  mobileInfoLevel.innerHTML = `
+    <div style="opacity:0.8">${skill.groupName}</div>
+    <div>
+      Level
+      <span style="color:${levelColors[skill.level]}; font-weight:600">
+        ${skill.level}
+      </span>
+    </div>
+  `;
+
+  const outerCard = mobileInfo.querySelector('.mobile-info-card');
+  const innerCard = mobileInfo.querySelector('.mobile-info-card-inner');
+
+  // Set outer area color based on category
+  outerCard.style.backgroundColor = skill.groupColor;
+
+  // Ensure inner text area stays white
+  innerCard.style.backgroundColor = '#ffffff';
+
+  mobileInfo.classList.remove('hidden');
+}
+
+
+
+
+
+function closeMobileInfo() {
+  mobileInfo.classList.add('hidden');
+}
+
+mobileInfo.addEventListener('click', e => {
+  if (e.target === mobileInfo) closeMobileInfo();
+});
+
+document.querySelector('.mobile-info-close')
+  .addEventListener('click', closeMobileInfo);
+
+
+window.addEventListener('load', () => {
+  const lightbox = document.getElementById('skillTreeLightbox');
+  const closeBtn = document.getElementById('closeLightbox');
+
+  // Show lightbox on page load
+  lightbox.style.display = 'flex';
+
+  // Close lightbox when button clicked
+  closeBtn.addEventListener('click', () => {
+    lightbox.style.display = 'none';
+  });
+});
+
+
+// --- Stars ---
+let stars = []; // keep track of created stars
+
+function createStars() {
+  stars = []; // empty initially
+  for (let i = 0; i < 300; i++) {
+    const star = document.createElement('div');
+    star.style.position = 'absolute';
+    star.style.width = `${Math.random()*2 + 1}px`;
+    star.style.height = star.style.width;
+    star.style.borderRadius = '50%';
+    star.style.backgroundColor = 'white';
+    star.style.opacity = Math.random()*0.8 + 0.2;
+
+    // normalized positions: 0 → 1
+    const leftNorm = Math.random();
+    const topNorm = Math.random();
+    star.dataset.leftNorm = leftNorm;
+    star.dataset.topNorm = topNorm;
+
+    // actual position
+    star.style.left = `${leftNorm * wrapper.offsetWidth}px`;
+    star.style.top = `${topNorm * wrapper.offsetHeight}px`;
+
+    wrapper.appendChild(star);
+    stars.push(star);
+  }
+}
+
+createStars();
+
+function repositionStars() {
+  stars.forEach(star => {
+    const left = parseFloat(star.dataset.leftNorm) * wrapper.offsetWidth;
+    const top = parseFloat(star.dataset.topNorm) * wrapper.offsetHeight;
+    star.style.left = `${left}px`;
+    star.style.top = `${top}px`;
+  });
+}
+
+window.addEventListener('resize', repositionStars);
+
+
+</script>
+</body>
+</html>

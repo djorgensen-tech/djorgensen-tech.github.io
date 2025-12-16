@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Projects - David</title>
+<style>
+  body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: #0f0f0f;
+    color: #f9f9f9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  .projects-container {
+    background-color: #0f0f0f; /* same as page */
+    border: 3px solid #ffffff;
+    padding: 20px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 70vh;
+    overflow-y: auto; /* scrolling */
+    box-sizing: border-box;
+  }
+
+  h1 {
+    text-align: center;
+    margin: 0 0 20px 0;
+    color: #ffffff;
+  }
+
+  .project-entry {
+    position: relative; /* for pseudo-element */
+    background-color: #ffffff;
+    color: #000000;
+    padding: 10px 15px;
+    margin-bottom: 15px;
+    text-decoration: none;
+    display: flex; /* for icon + text */
+    align-items: center;
+    transition: transform 0.2s;
+  }
+
+  /* Inner black border on hover using pseudo-element */
+  .project-entry::before {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    right: 4px;
+    bottom: 4px;
+    border: 2px solid #000000;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+
+  .project-entry:hover::before {
+    opacity: 1;
+  }
+
+  .project-entry:hover {
+    transform: translateY(-3px);
+  }
+
+  /* Icon styling */
+  .project-entry img {
+    width: 30px;
+    height: 30px;
+    object-fit: cover;
+    margin-right: 15px;
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="projects-container">
+  <h1>My Projects</h1>
+
+  <a class="project-entry" href="../tools/sketchup-converter.html" target="_top">
+    <img src="../src/icons/sketchup.png" alt="SketchUp Icon">
+    SketchUp SVG to HTML Canvas Tool
+  </a>
+
+  <a class="project-entry" href="https://www.rewardshub.online" target="_top">
+    <img src="../src/icons/rewardshub.png" alt="RewardsHub Icon">
+    RewardsHub
+  </a>
+
+  <a class="project-entry" href="https://github.com/djorgensentech/WeaponDisplayGenerator" target="_top">
+    <img src="../src/icons/minecraft-stands.png" alt="Minecraft Icon">
+    Minecraft Armor Stand Command Generator
+  </a>
+
+  <a class="project-entry" href="../tools/minecraft-industrial-design.html" target="_top">
+    <img src="../src/icons/minecraft-server.png" alt="Minecraft Icon">
+    Minecraft Industrial Design Project at USU
+  </a>
+
+  <a class="project-entry" href="../tools/tir.html" target="_top">
+    <img src="../src/icons/ti84.png" alt="TI-84 Icon">
+    TIR - 3D Modeler for TI-84 Plus CE Calculators
+  </a>
+</div>
+
+</body>
+</html>

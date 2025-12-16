@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>David Jorgensen – Portfolio & Resume</title>
+<link rel="icon" type="image/png" href="./src/icons/favicon.png">
+<link id="favicon" rel="icon" type="image/png" href="favicon-light.png">
+<style>
+  body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
+    background-color: #0f0f0f;
+  }
+
+  .scroll-container {
+    height: 100vh;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scroll-container::-webkit-scrollbar {
+    display: none;
+  }
+
+  .section {
+    height: 100vh;
+    scroll-snap-align: start;
+    position: relative;
+  }
+
+  iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    overflow: hidden;
+  }
+
+  .arrow {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 4rem;
+    color: #ffffff;
+    cursor: pointer;
+    user-select: none;
+    z-index: 100;
+    opacity: 0.7;
+    padding: 20px 40px;
+    border-radius: 12px;
+    transition: opacity 0.3s ease;
+    text-shadow: 2px 2px 0 #000;
+  }
+
+  .arrow:hover {
+    opacity: 1;
+  }
+
+  .arrow-up { top: 10px; }
+  .arrow-down { bottom: 10px; }
+</style>
+</head>
+<body>
+
+<!-- Navigation Arrows -->
+<div class="arrow arrow-up" id="arrowUp" onclick="scrollUp()">&#8593;</div>
+<div class="arrow arrow-down" id="arrowDown" onclick="scrollDown()">&#8595;</div>
+
+<!-- Scroll Container with Sections -->
+<div class="scroll-container" id="scrollContainer">
+  <section class="section" id="homeSection">
+    <iframe src="./pages/home.html" scrolling="no"></iframe>
+  </section>
+  <section class="section" id="aboutSection">
+    <iframe src="./pages/about.html" scrolling="no"></iframe>
+  </section>
+  <section class="section" id="skillsSection">
+    <iframe src="./pages/skills.html" scrolling="no"></iframe>
+  </section>
+  <section class="section" id="projectsSection">
+    <iframe src="./pages/projects.html" scrolling="no"></iframe>
+  </section>
+  <section class="section" id="contactSection">
+    <iframe src="./pages/contact.html" scrolling="no"></iframe>
+  </section>
+</div>
+
+<script>
+const container = document.getElementById('scrollContainer');
+const arrowUp = document.getElementById('arrowUp');
+const arrowDown = document.getElementById('arrowDown');
+
+function updateArrows() {
+  const scrollTop = container.scrollTop;
+  const maxScroll = container.scrollHeight - container.clientHeight;
+  const threshold = 5;
+
+  arrowUp.style.opacity = scrollTop <= threshold ? 0 : 0.7;
+  arrowDown.style.opacity = scrollTop >= maxScroll - threshold ? 0 : 0.7;
+}
+
+function scrollUp() {
+  container.scrollBy({ top: -window.innerHeight, behavior: 'smooth' });
+  setTimeout(updateArrows, 300);
+}
+
+function scrollDown() {
+  container.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
+  setTimeout(updateArrows, 300);
+}
+
+window.addEventListener('load', () => {
+  container.scrollTop = 0;
+  updateArrows();
+});
+
+function scrollToSection(id) {
+  const section = document.getElementById(id);
+  if (section) {
+    section.scrollIntoView({ behavior: 'smooth' });
+  }
+}
+
+container.addEventListener('scroll', updateArrows);
+</script>
+
+<script>
+  function setFavicon(theme) {
+    const favicon = document.getElementById('favicon');
+    if (theme === 'dark') {
+      favicon.href = './src/icons/favicon-dark.png';
+    } else {
+      favicon.href = './src/icons/favicon-light.png';
+    }
+  }
+
+  // Example: switch based on system preference
+  const darkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  setFavicon(darkMode ? 'dark' : 'light');
+
+  // Optional: listen for changes in system theme
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    setFavicon(e.matches ? 'dark' : 'light');
+  });
+</script>
+
+
+</body>
+</html>

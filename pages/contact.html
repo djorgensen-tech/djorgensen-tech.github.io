@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact - David</title>
+<style>
+  body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: #0f0f0f;
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 20px;
+    box-sizing: border-box;
+    min-height: 100vh;
+  }
+
+  .contact-container {
+    max-width: 600px;
+    width: 100%;
+    text-align: center;
+  }
+
+  h1 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+  }
+
+  p {
+    font-size: 1.4rem;
+    line-height: 1.6;
+    margin-bottom: 30px;
+  }
+
+  .contact-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.2rem;
+    color: #ffffff;
+    text-decoration: none;
+    margin-bottom: 15px;
+  }
+
+  .contact-item svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    fill: #ffffff;
+  }
+
+  .social-links a {
+  position: relative;
+  display: inline-block;   /* needed for tooltip positioning */
+  margin: 0 10px;
+  width: 40px;
+  height: 40px;
+}
+
+.social-links a svg {
+  width: 100%;
+  height: 100%;
+  fill: #ffffff; /* or whatever color you want */
+}
+
+.social-links a::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 110%; /* slightly above the icon */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #222;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 10;
+}
+
+.social-links a:hover::after {
+  opacity: 1;
+}
+
+</style>
+</head>
+<body>
+
+<div class="contact-container">
+  <h1>Contact</h1>
+<p>Thanks for exploring my site! </p>
+<p>Here’s how to reach me or view my resume:</p>
+
+
+  <!-- Email and Phone -->
+  <div>
+    <a href="mailto:david@djorgensen.tech" class="contact-item">
+      <!-- Simpler Envelope Icon -->
+      <svg viewBox="0 0 24 24">
+        <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+      </svg>
+      david@djorgensen.tech
+    </a>
+  </div>
+
+  <div>
+    <a href="tel:+13852618593" class="contact-item">
+      <!-- Phone Icon -->
+      <svg viewBox="0 0 24 24">
+        <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1 1 0 011.11-.21c1.2.48 2.5.73 3.82.73a1 1 0 011 1v3.5a1 1 0 01-1 1C10.07 22 2 13.93 2 4a1 1 0 011-1H6.5a1 1 0 011 1c0 1.32.25 2.62.73 3.82a1 1 0 01-.21 1.11l-2.2 2.2z"/>
+      </svg>
+      (385) 261-8593
+    </a>
+  </div>
+
+  <!-- Social Links -->
+<div class="social-links">
+  <a href="https://www.linkedin.com/in/david-jorgensen-/" target="_blank" class="tooltip" data-tooltip="LinkedIn">
+    <svg viewBox="0 0 24 24">
+      <path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11 19h-3v-10h3v10zm-1.5-11.2c-.97 0-1.75-.79-1.75-1.75s.78-1.75 1.75-1.75 1.75.79 1.75 1.75-.78 1.75-1.75 1.75zm13.5 11.2h-3v-5.5c0-1.32-.03-3-1.83-3s-2.12 1.43-2.12 2.9v5.6h-3v-10h2.88v1.36h.04c.4-.75 1.38-1.54 2.84-1.54 3.04 0 3.6 2 3.6 4.6v5.58z"/>
+    </svg>
+  </a>
+
+  <a href="https://github.com/djorgensentech" target="_blank" class="tooltip" data-tooltip="GitHub">
+    <svg viewBox="0 0 24 24">
+      <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.11.82-.26.82-.577v-2.234c-3.338.726-4.033-1.415-4.033-1.415-.546-1.387-1.333-1.756-1.333-1.756-1.09-.746.082-.731.082-.731 1.205.084 1.838 1.238 1.838 1.238 1.07 1.835 2.807 1.305 3.492.998.108-.774.418-1.305.76-1.605-2.665-.303-5.467-1.333-5.467-5.932 0-1.31.468-2.382 1.235-3.222-.123-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.3 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.29-1.552 3.296-1.23 3.296-1.23.654 1.653.242 2.873.12 3.176.77.84 1.234 1.912 1.234 3.222 0 4.61-2.807 5.625-5.48 5.921.43.372.823 1.103.823 2.222v3.293c0 .32.216.694.825.576C20.565 21.796 24 17.3 24 12c0-6.63-5.373-12-12-12z"/>
+    </svg>
+  </a>
+
+  <a href="../files/resume.pdf" target="_blank" class="tooltip" data-tooltip="Resume">
+    <svg viewBox="0 0 24 24">
+      <path d="M6 2h9l5 5v15a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm9 0v5h5M8 11h8v2H8v-2zm0 4h8v2H8v-2z"/>
+    </svg>
+  </a>
+</div>
+
+
+</div>
+
+</body>
+</html>
